@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven {
+            url '/Users/caesar.qiu/.m2/repository'
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url '/Users/caesar.qiu/.m2/repository'
+        }
+    }
+}
+rootProject.name = "TradPlus Unity Plugin"
+include ':app'
