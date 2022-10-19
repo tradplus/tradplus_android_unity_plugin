@@ -8,6 +8,7 @@ import com.tradplus.ads.base.bean.TPAdInfo;
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
+import com.tradplus.ads.open.nativead.TPNativeBanner;
 import com.tradplus.ads.open.offerwall.OffWallBalanceListener;
 import com.tradplus.ads.open.offerwall.OfferWallAdListener;
 import com.tradplus.ads.open.offerwall.TPOfferWall;
@@ -105,6 +106,15 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     }
 
 
+    public void setCustomShowData(String adUnitId,String data){
+        TPOfferWall tpOfferWall = getOrCreateOfferWall(adUnitId,"");
+
+        if(tpOfferWall != null){
+            tpOfferWall.setCustomShowData(JSON.parseObject(data));
+        }
+    }
+
+
     private TPOfferWall getOrCreateOfferWall(String adUnitId, String data) {
         return getOrCreateOfferWall(adUnitId,data,null);
     }
@@ -122,9 +132,15 @@ public class TPOfferWallManager extends BaseUnityPlugin {
         if (tpOfferWall == null) {
             tpOfferWall = new TPOfferWall(getActivity(),adUnitId,extraInfo == null ? true : extraInfo.isAutoload());
             mTPOfferWall.put(adUnitId, tpOfferWall);
+
+            boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
+
             tpOfferWall.setAdListener(new TPOfferWallManager.TPOfferWallAdListener(adUnitId,listener));
-            tpOfferWall.setAllAdLoadListener(new TPOfferWallManager.TPOfferWallAllAdListener(adUnitId,listener));
-            tpOfferWall.setOffWallBalanceListener(new TPOfferWallBalanceListener(adUnitId,listener));
+            if (!isSimpleListener) {
+
+                tpOfferWall.setAllAdLoadListener(new TPOfferWallManager.TPOfferWallAllAdListener(adUnitId, listener));
+                tpOfferWall.setOffWallBalanceListener(new TPOfferWallBalanceListener(adUnitId, listener));
+            }
 
         }
 //        LogUtil.ownShow("map params = "+params);

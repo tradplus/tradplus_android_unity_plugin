@@ -166,4 +166,8 @@ public class TradPlusSdk extends BaseUnityPlugin {
         com.tradplus.ads.open.TradPlusSdk.setCnServer(isCn);
     }
 
+    public static void setOpenDelayLoadAds(boolean isOpen){
+        com.tradplus.ads.open.TradPlusSdk.setOpenDelayLoadAds(isOpen);
+    }
+
 }

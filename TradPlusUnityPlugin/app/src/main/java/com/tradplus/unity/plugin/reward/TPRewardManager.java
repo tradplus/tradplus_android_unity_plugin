@@ -10,6 +10,7 @@ import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.RewardAdExListener;
+import com.tradplus.ads.open.offerwall.TPOfferWall;
 import com.tradplus.ads.open.reward.RewardAdListener;
 import com.tradplus.ads.open.reward.TPReward;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
@@ -72,6 +73,15 @@ public class TPRewardManager extends BaseUnityPlugin {
     }
 
 
+    public void setCustomShowData(String adUnitId,String data){
+        TPReward tpReward = getOrCreateReward(adUnitId,"");
+
+        if(tpReward != null){
+            tpReward.setCustomShowData(JSON.parseObject(data));
+        }
+    }
+
+
     private TPReward getOrCreateReward(String adUnitId, String data) {
         return getOrCreateReward(adUnitId,data,null);
     }
@@ -89,10 +99,17 @@ public class TPRewardManager extends BaseUnityPlugin {
         if (tpReward == null) {
             tpReward = new TPReward(getActivity(),adUnitId,extraInfo == null ? true : extraInfo.isAutoload());
             mTPReward.put(adUnitId, tpReward);
+
+            boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
+
             tpReward.setAdListener(new TPRewardManager.TPRewardAdListener(adUnitId,listener));
-            tpReward.setAllAdLoadListener(new TPRewardManager.TPRewardAllAdListener(adUnitId,listener));
-            tpReward.setDownloadListener(new TPRewardManager.TPRewardDownloadListener(adUnitId,listener));
-            tpReward.setRewardAdExListener(new TPRewardExdListener(adUnitId,listener));
+            tpReward.setRewardAdExListener(new TPRewardExdListener(adUnitId, listener));
+            if (!isSimpleListener) {
+
+                tpReward.setAllAdLoadListener(new TPRewardManager.TPRewardAllAdListener(adUnitId, listener));
+                tpReward.setDownloadListener(new TPRewardManager.TPRewardDownloadListener(adUnitId, listener));
+
+            }
 
         }
 //        LogUtil.ownShow("map params = "+params);

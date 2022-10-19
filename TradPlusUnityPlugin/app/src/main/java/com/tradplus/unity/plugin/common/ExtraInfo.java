@@ -16,6 +16,7 @@ public class ExtraInfo {
     private float width;
     private float height;
     private int adPosition;
+    private boolean isSimpleListener;
 
     public boolean isAutoload() {
         return isAutoload;
@@ -116,5 +117,13 @@ public class ExtraInfo {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public boolean isSimpleListener() {
+        return isSimpleListener;
+    }
+
+    public void setSimpleListener(boolean simpleListener) {
+        isSimpleListener = simpleListener;
     }
 }

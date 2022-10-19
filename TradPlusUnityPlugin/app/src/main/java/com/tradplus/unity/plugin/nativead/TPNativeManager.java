@@ -18,6 +18,7 @@ import com.tradplus.ads.core.AdCacheManager;
 import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
+import com.tradplus.ads.open.interstitial.TPInterstitial;
 import com.tradplus.ads.open.nativead.NativeAdListener;
 import com.tradplus.ads.open.nativead.TPNative;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
@@ -79,6 +80,15 @@ public class TPNativeManager extends BaseUnityPlugin {
         }
 
         return false;
+    }
+
+
+    public void setCustomShowData(String adUnitId,String data){
+        TPNative tpNative = getOrCreateBanner(adUnitId, "").getTpNative();
+
+        if(tpNative != null){
+            tpNative.setCustomShowData(JSON.parseObject(data));
+        }
     }
 
     private void show(TPNativeInfo info, String sceneId, String layoutName) {
@@ -224,9 +234,13 @@ public class TPNativeManager extends BaseUnityPlugin {
             tpNative = new TPNative(getActivity(), adUnitId, extraInfo == null ? true : extraInfo.isAutoload());
 
 
+            boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
+
             tpNative.setAdListener(new TPNativeAdListener(adUnitId, listener));
-            tpNative.setAllAdLoadListener(new TPNativeAllAdListener(adUnitId, listener));
-            tpNative.setDownloadListener(new TPNativeDownloadListener(adUnitId, listener));
+            if(!isSimpleListener) {
+                tpNative.setAllAdLoadListener(new TPNativeAllAdListener(adUnitId, listener));
+                tpNative.setDownloadListener(new TPNativeDownloadListener(adUnitId, listener));
+            }
 
 
             tpNativeInfo.setTpNative(tpNative);

@@ -65,7 +65,7 @@ public class TPBannerManager extends BaseUnityPlugin {
         TPBanner tpBanner = getOrCreateBanner(unitId, "");
 
         if (tpBanner != null) {
-            tpBanner.showAd();
+            tpBanner.showAd(sceneId);
         }
 
     }
@@ -135,6 +135,14 @@ public class TPBannerManager extends BaseUnityPlugin {
 
     }
 
+    public void setCustomShowData(String adUnitId,String data){
+        TPBanner tpBanner = getOrCreateBanner(adUnitId, "");
+
+        if(tpBanner != null){
+            tpBanner.setCustomShowData(JSON.parseObject(data));
+        }
+    }
+
 
     private TPBanner getOrCreateBanner(String adUnitId, String data) {
         return getOrCreateBanner(adUnitId, data, null);
@@ -157,12 +165,15 @@ public class TPBannerManager extends BaseUnityPlugin {
             mTPBanner.put(adUnitId, tpBanner);
 
             boolean closeAutoShow = extraInfo == null ? false : extraInfo.isCloseAutoShow();
+            boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
             if (closeAutoShow) {
                 tpBanner.closeAutoShow();
             }
             tpBanner.setAdListener(new TPBannerAdListener(adUnitId, listener));
-            tpBanner.setAllAdLoadListener(new TPBannerAllAdListener(adUnitId, listener));
-            tpBanner.setDownloadListener(new TPBannerDownloadListener(adUnitId, listener));
+            if(!isSimpleListener) {
+                tpBanner.setAllAdLoadListener(new TPBannerAllAdListener(adUnitId, listener));
+                tpBanner.setDownloadListener(new TPBannerDownloadListener(adUnitId, listener));
+            }
 
 
             TPBanner finalTpBanner = tpBanner;
