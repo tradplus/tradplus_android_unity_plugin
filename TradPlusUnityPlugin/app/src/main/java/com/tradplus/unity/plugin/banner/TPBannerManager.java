@@ -1,10 +1,13 @@
 package com.tradplus.unity.plugin.banner;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.tradplus.ads.base.bean.TPAdError;
@@ -12,16 +15,23 @@ import com.tradplus.ads.base.bean.TPAdInfo;
 import com.tradplus.ads.base.common.TPTaskManager;
 import com.tradplus.ads.common.DataKeys;
 import com.tradplus.ads.common.serialization.JSON;
+import com.tradplus.ads.common.util.DeviceUtils;
+import com.tradplus.ads.common.util.ResourceUtils;
 import com.tradplus.ads.common.util.ScreenUtil;
 import com.tradplus.ads.core.AdCacheManager;
+import com.tradplus.ads.core.cache.AdCache;
+import com.tradplus.ads.mgr.nativead.TPNativeAdRenderImpl;
+import com.tradplus.ads.mobileads.gdpr.CommonUtil;
 import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.banner.BannerAdListener;
 import com.tradplus.ads.open.banner.TPBanner;
+import com.tradplus.ads.open.nativead.TPNativeBanner;
 import com.tradplus.ads.unity.TradplusUnityPlugin;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
 import com.tradplus.unity.plugin.common.ExtraInfo;
+import com.tradplus.unity.plugin.nativebanner.TPNativeBannerManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +75,7 @@ public class TPBannerManager extends BaseUnityPlugin {
         TPBanner tpBanner = getOrCreateBanner(unitId, "");
 
         if (tpBanner != null) {
-            tpBanner.showAd(sceneId);
+            tpBanner.showAd();
         }
 
     }
@@ -135,10 +145,10 @@ public class TPBannerManager extends BaseUnityPlugin {
 
     }
 
-    public void setCustomShowData(String adUnitId,String data){
+    public void setCustomShowData(String adUnitId, String data) {
         TPBanner tpBanner = getOrCreateBanner(adUnitId, "");
 
-        if(tpBanner != null){
+        if (tpBanner != null) {
             tpBanner.setCustomShowData(JSON.parseObject(data));
         }
     }
@@ -159,6 +169,7 @@ public class TPBannerManager extends BaseUnityPlugin {
 
         HashMap<String, Object> temp = new HashMap<>();
 
+
         TPBanner tpBanner = mTPBanner.get(adUnitId);
         if (tpBanner == null) {
             tpBanner = new TPBanner(getActivity());
@@ -170,9 +181,18 @@ public class TPBannerManager extends BaseUnityPlugin {
                 tpBanner.closeAutoShow();
             }
             tpBanner.setAdListener(new TPBannerAdListener(adUnitId, listener));
-            if(!isSimpleListener) {
+            if (!isSimpleListener) {
                 tpBanner.setAllAdLoadListener(new TPBannerAllAdListener(adUnitId, listener));
                 tpBanner.setDownloadListener(new TPBannerDownloadListener(adUnitId, listener));
+            }
+
+            String className = extraInfo == null ? "" : (TextUtils.isEmpty(extraInfo.getClassName()) ? "" : extraInfo.getClassName());
+
+            if (!TextUtils.isEmpty(className)) {
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                ViewGroup layoutView = (ViewGroup) inflater.inflate(ResourceUtils.getLayoutIdByName(getActivity(), className), null);
+                TPNativeAdRenderImpl adRender = new TPNativeAdRenderImpl(getActivity(), layoutView);
+                tpBanner.setNativeAdRender(adRender);
             }
 
 
@@ -183,15 +203,15 @@ public class TPBannerManager extends BaseUnityPlugin {
                 public void run() {
                     RelativeLayout mLayout = null;
                     boolean hasPosition = false;
-                    int x = 0,y = 0;
-                    if(finalExtraInfo != null) {
+                    int x = 0, y = 0;
+                    if (finalExtraInfo != null) {
                         if (finalExtraInfo.getX() != 0 || finalExtraInfo.getY() != 0) {
                             x = (int) finalExtraInfo.getX();
                             y = (int) finalExtraInfo.getY();
                             hasPosition = true;
                         }
                     }
-                    mLayout = ScreenUtil.prepLayout(hasPosition ? 0 : (finalExtraInfo == null ? 0 : finalExtraInfo.getAdPosition()) , mLayout, getActivity());
+                    mLayout = ScreenUtil.prepLayout(hasPosition ? 0 : (finalExtraInfo == null ? 0 : finalExtraInfo.getAdPosition()), mLayout, getActivity());
 
                     getActivity().addContentView(mLayout,
                             new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -200,13 +220,28 @@ public class TPBannerManager extends BaseUnityPlugin {
                     mLayout.setVisibility(RelativeLayout.VISIBLE);
 
 
-                    if(hasPosition){
+                    if (hasPosition) {
                         //设置锚点
                         finalTpBanner.setX(x);
                         finalTpBanner.setY(y);
                     }
 
                     mLayout.addView(finalTpBanner);
+
+                    RelativeLayout.LayoutParams params =
+                            (RelativeLayout.LayoutParams) finalTpBanner.getLayoutParams();
+
+                    float density = ScreenUtil.getScreenDensity(getActivity());
+
+                    if(finalExtraInfo != null) {
+                        params.width = (int) (finalExtraInfo.getWidth() * density);
+                        params.height = (int) (finalExtraInfo.getHeight() * density);
+                    }else{
+                        params.width = (int) (320 * density);
+                        params.height = (int) (50 * density);
+                    }
+
+                    finalTpBanner.setLayoutParams(params);
                 }
             });
 
@@ -219,13 +254,13 @@ public class TPBannerManager extends BaseUnityPlugin {
             }
 
             if (extraInfo.getWidth() != 0) {
-                temp.put("width", (int)extraInfo.getWidth());
+                temp.put("width", (int) extraInfo.getWidth());
             }
             if (extraInfo.getHeight() != 0) {
-                temp.put("height",(int)extraInfo.getHeight());
+                temp.put("height", (int) extraInfo.getHeight());
             }
 
-            Log.v("TradPlusSdk", "setCustomParams unitid=" + adUnitId + "======================="+JSON.toJSONString(temp));
+            Log.v("TradPlusSdk", "setCustomParams unitid=" + adUnitId + "=======================" + JSON.toJSONString(temp));
 
             tpBanner.setCustomParams(temp);
 
@@ -236,6 +271,13 @@ public class TPBannerManager extends BaseUnityPlugin {
 
         return tpBanner;
     }
+
+    private TPAdInfo getShowAdInfo(String unitId) {
+        AdCache cache = AdCacheManager.getInstance().getReadyAd(unitId);
+        if (cache == null) return null;
+        return new TPAdInfo(unitId, cache.getAdapter());
+    }
+
 
 
     private class TPBannerDownloadListener implements DownloadListener {
@@ -363,6 +405,7 @@ public class TPBannerManager extends BaseUnityPlugin {
         }
     }
 
+
     private class TPBannerAdListener extends BannerAdListener {
         private String mAdUnitId;
         private TPBannerListener listener;
@@ -377,40 +420,6 @@ public class TPBannerManager extends BaseUnityPlugin {
             if (listener != null) {
                 listener.onAdLoaded(mAdUnitId, JSON.toJSONString(tpAdInfo));
             }
-            Log.v("TradPlusSdk", "tpAdInfo.adViewWidth: ");
-            int width, height;
-            if (tpAdInfo.adViewWidth == 0) {
-                // 获取服务器值
-                if (tpAdInfo.width == 0) {
-                    width = 320;
-                } else {
-                    width = tpAdInfo.width;
-                }
-            } else {
-                width = tpAdInfo.adViewWidth;
-            }
-            Log.v("TradPlusSdk", "width: " + width);
-
-            if (tpAdInfo.adViewHeight == 0) {
-                if (tpAdInfo.height == 0) {
-                    height = 50;
-                } else {
-                    height = tpAdInfo.height;
-                }
-            } else {
-                height = tpAdInfo.adViewHeight;
-            }
-            Log.v("TradPlusSdk", "height: " + height);
-            TPBanner tpBanner = getOrCreateBanner(mAdUnitId, "");
-            RelativeLayout.LayoutParams params =
-                    (RelativeLayout.LayoutParams) tpBanner.getLayoutParams();
-
-            float density = ScreenUtil.getScreenDensity(getActivity());
-
-            params.width = (int) (width * density);
-            params.height = (int) (height * density);
-
-            tpBanner.setLayoutParams(params);
             Log.v("TradPlusSdk", "loaded unitid=" + mAdUnitId + "=======================");
         }
 
