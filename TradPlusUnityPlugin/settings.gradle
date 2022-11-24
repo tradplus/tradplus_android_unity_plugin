@@ -3,9 +3,6 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        maven {
-            url '/Users/caesar.qiu/.m2/repository'
-        }
     }
 }
 dependencyResolutionManagement {
