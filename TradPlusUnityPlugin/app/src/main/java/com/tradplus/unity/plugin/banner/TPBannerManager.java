@@ -403,6 +403,14 @@ public class TPBannerManager extends BaseUnityPlugin {
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
         }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
+        }
     }
 
 

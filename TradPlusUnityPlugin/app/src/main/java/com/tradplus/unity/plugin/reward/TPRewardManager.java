@@ -97,7 +97,7 @@ public class TPRewardManager extends BaseUnityPlugin {
         HashMap<String, Object> temp = new HashMap<>();
         TPReward tpReward = mTPReward.get(adUnitId);
         if (tpReward == null) {
-            tpReward = new TPReward(getActivity(),adUnitId,extraInfo == null ? true : extraInfo.isAutoload());
+            tpReward = new TPReward(getActivity(),adUnitId);
             mTPReward.put(adUnitId, tpReward);
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
@@ -300,6 +300,14 @@ public class TPRewardManager extends BaseUnityPlugin {
                 listener.onBiddingEnd(mAdUnitId, JSON.toJSONString(tpAdInfo),JSON.toJSONString(tpAdError));
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
+        }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
         }
     }
     private class TPRewardAdListener implements RewardAdListener {

@@ -130,7 +130,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
         HashMap<String, Object> temp = new HashMap<>();
         TPOfferWall tpOfferWall = mTPOfferWall.get(adUnitId);
         if (tpOfferWall == null) {
-            tpOfferWall = new TPOfferWall(getActivity(),adUnitId,extraInfo == null ? true : extraInfo.isAutoload());
+            tpOfferWall = new TPOfferWall(getActivity(),adUnitId);
             mTPOfferWall.put(adUnitId, tpOfferWall);
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
@@ -303,6 +303,14 @@ public class TPOfferWallManager extends BaseUnityPlugin {
                 listener.onBiddingEnd(mAdUnitId, JSON.toJSONString(tpAdInfo),JSON.toJSONString(tpAdError));
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
+        }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
         }
     }
     private class TPOfferWallAdListener implements OfferWallAdListener {

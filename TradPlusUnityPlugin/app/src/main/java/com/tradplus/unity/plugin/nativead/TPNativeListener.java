@@ -28,6 +28,9 @@ public interface TPNativeListener {
     void onBiddingStart(String unitId,String tpAdInfo) ;
     void onBiddingEnd(String unitId,String tpAdInfo, String adError) ;
 
+    void onAdIsLoading(String unitId) ;
+
+
     void onDownloadStart(String unitId,String tpAdInfo, long totalBytes, long currBytes, String fileName, String appName);
     void onDownloadUpdate(String unitId,String tpAdInfo, long totalBytes, long currBytes, String fileName, String appName,int progress);
     void onDownloadPause(String unitId,String tpAdInfo, long totalBytes, long currBytes, String fileName, String appName);

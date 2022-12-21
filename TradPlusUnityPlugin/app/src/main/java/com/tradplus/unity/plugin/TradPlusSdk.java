@@ -48,6 +48,10 @@ public class TradPlusSdk extends BaseUnityPlugin {
         SegmentUtils.initCustomMap(Json.jsonStringToMap(map));
     }
 
+    public static void setSettingDataParam(String map) {
+        com.tradplus.ads.open.TradPlusSdk.setSettingDataParam(JSON.parseObject(map));
+    }
+
 
     public static void checkCurrentArea(TPPrivacyRegionListener listener) {
         com.tradplus.ads.open.TradPlusSdk.checkCurrentArea(getActivity(), new TPPrivacyManager.OnPrivacyRegionListener() {

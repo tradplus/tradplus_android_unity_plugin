@@ -99,7 +99,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
 
         TPInterstitial tpInterstitial = mTPInterstitial.get(adUnitId);
         if (tpInterstitial == null) {
-            tpInterstitial = new TPInterstitial(getActivity(), adUnitId, extraInfo == null ? true : extraInfo.isAutoload());
+            tpInterstitial = new TPInterstitial(getActivity(), adUnitId);
             mTPInterstitial.put(adUnitId, tpInterstitial);
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
@@ -257,6 +257,14 @@ public class TPInterstitialManager extends BaseUnityPlugin {
                 listener.onBiddingEnd(mAdUnitId, JSON.toJSONString(tpAdInfo), JSON.toJSONString(tpAdError));
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
+        }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
         }
     }
 
