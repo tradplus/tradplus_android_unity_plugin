@@ -2,17 +2,17 @@ package com.tradplus.unity.plugin;
 
 import android.util.Log;
 
+import com.tradplus.ads.base.Const;
 import com.tradplus.ads.base.bean.TPAdInfo;
 import com.tradplus.ads.base.common.TPDiskManager;
 import com.tradplus.ads.base.common.TPPrivacyManager;
+import com.tradplus.ads.base.util.SegmentUtils;
+import com.tradplus.ads.base.util.TestDeviceUtil;
 import com.tradplus.ads.common.ClientMetadata;
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.common.util.Json;
 import com.tradplus.ads.core.AdCacheManager;
 import com.tradplus.ads.core.GlobalImpressionManager;
-import com.tradplus.ads.mobileads.gdpr.Const;
-import com.tradplus.ads.mobileads.util.SegmentUtils;
-import com.tradplus.ads.mobileads.util.TestDeviceUtil;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
 
 public class TradPlusSdk extends BaseUnityPlugin {

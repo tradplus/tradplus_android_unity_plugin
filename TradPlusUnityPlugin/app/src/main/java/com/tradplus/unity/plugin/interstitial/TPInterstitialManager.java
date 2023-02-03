@@ -5,11 +5,10 @@ import android.util.Log;
 
 import com.tradplus.ads.base.bean.TPAdError;
 import com.tradplus.ads.base.bean.TPAdInfo;
+import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.common.serialization.JSON;
-import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
-import com.tradplus.ads.open.banner.TPBanner;
 import com.tradplus.ads.open.interstitial.InterstitialAdListener;
 import com.tradplus.ads.open.interstitial.TPInterstitial;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
