@@ -28,6 +28,9 @@ public interface TPOfferWallListener {
     void onBiddingStart(String unitId,String tpAdInfo) ;
     void onBiddingEnd(String unitId,String tpAdInfo, String adError) ;
 
+    void onAdIsLoading(String unitId) ;
+
+
     void currencyBalanceSuccess(String unitId,int amount,String msg);
     void currencyBalanceFailed(String unitId,String msg);
     void spendCurrencySuccess(String unitId,int amount,String msg);
