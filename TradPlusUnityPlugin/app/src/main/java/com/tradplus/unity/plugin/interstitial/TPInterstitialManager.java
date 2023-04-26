@@ -5,11 +5,10 @@ import android.util.Log;
 
 import com.tradplus.ads.base.bean.TPAdError;
 import com.tradplus.ads.base.bean.TPAdInfo;
+import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.common.serialization.JSON;
-import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
-import com.tradplus.ads.open.banner.TPBanner;
 import com.tradplus.ads.open.interstitial.InterstitialAdListener;
 import com.tradplus.ads.open.interstitial.TPInterstitial;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
@@ -36,7 +35,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
     private Map<String, TPInterstitial> mTPInterstitial = new ConcurrentHashMap<>();
 
     public void loadAd(String unitId, String data, TPInterstitialListener listener) {
-        TPInterstitial tpInterstitial = getOrCreateInterstitial(unitId, data, listener);
+        TPInterstitial tpInterstitial = getTPInterstitial(unitId, data, listener);
 
         if (tpInterstitial != null) {
             tpInterstitial.loadAd();
@@ -45,7 +44,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
     }
 
     public void showAd(String unitId, String sceneId) {
-        TPInterstitial tpInterstitial = getOrCreateInterstitial(unitId, "");
+        TPInterstitial tpInterstitial = getTPInterstitial(unitId);
 
         if (tpInterstitial != null) {
             tpInterstitial.showAd(getActivity(), sceneId);
@@ -54,7 +53,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
     }
 
     public void entryAdScenario(String unitId, String sceneId) {
-        TPInterstitial tpInterstitial = getOrCreateInterstitial(unitId, "");
+        TPInterstitial tpInterstitial = getTPInterstitial(unitId);
 
         if (tpInterstitial != null) {
             tpInterstitial.entryAdScenario(sceneId);
@@ -63,7 +62,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
     }
 
     public boolean isReady(String unitId) {
-        TPInterstitial tpInterstitial = getOrCreateInterstitial(unitId, "");
+        TPInterstitial tpInterstitial = getTPInterstitial(unitId);
 
         if (tpInterstitial != null) {
             return tpInterstitial.isReady();
@@ -74,7 +73,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
 
 
     public void setCustomShowData(String adUnitId, String data) {
-        TPInterstitial tpInterstitial = getOrCreateInterstitial(adUnitId, "");
+        TPInterstitial tpInterstitial = getTPInterstitial(adUnitId);
 
         if (tpInterstitial != null) {
             tpInterstitial.setCustomShowData(JSON.parseObject(data));
@@ -82,11 +81,11 @@ public class TPInterstitialManager extends BaseUnityPlugin {
     }
 
 
-    private TPInterstitial getOrCreateInterstitial(String adUnitId, String data) {
-        return getOrCreateInterstitial(adUnitId, data, null);
+    private TPInterstitial getTPInterstitial(String adUnitId) {
+        return mTPInterstitial.get(adUnitId);
     }
 
-    private TPInterstitial getOrCreateInterstitial(String adUnitId, String data, TPInterstitialListener listener) {
+    private TPInterstitial getTPInterstitial(String adUnitId, String data, TPInterstitialListener listener) {
 
         Log.i("tradplus", "data = " + data + " mTPInterstitial = " + mTPInterstitial + " listener = " + listener);
 
@@ -99,7 +98,7 @@ public class TPInterstitialManager extends BaseUnityPlugin {
 
         TPInterstitial tpInterstitial = mTPInterstitial.get(adUnitId);
         if (tpInterstitial == null) {
-            tpInterstitial = new TPInterstitial(getActivity(), adUnitId, extraInfo == null ? true : extraInfo.isAutoload());
+            tpInterstitial = new TPInterstitial(getActivity(), adUnitId);
             mTPInterstitial.put(adUnitId, tpInterstitial);
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
@@ -257,6 +256,14 @@ public class TPInterstitialManager extends BaseUnityPlugin {
                 listener.onBiddingEnd(mAdUnitId, JSON.toJSONString(tpAdInfo), JSON.toJSONString(tpAdError));
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
+        }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
         }
     }
 

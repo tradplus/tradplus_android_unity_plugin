@@ -5,12 +5,11 @@ import android.util.Log;
 
 import com.tradplus.ads.base.bean.TPAdError;
 import com.tradplus.ads.base.bean.TPAdInfo;
+import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.common.serialization.JSON;
-import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.RewardAdExListener;
-import com.tradplus.ads.open.offerwall.TPOfferWall;
 import com.tradplus.ads.open.reward.RewardAdListener;
 import com.tradplus.ads.open.reward.TPReward;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
@@ -36,7 +35,7 @@ public class TPRewardManager extends BaseUnityPlugin {
     private Map<String, TPReward> mTPReward = new ConcurrentHashMap<>();
 
     public void loadAd(String unitId,String data,TPRewardListener listener){
-        TPReward tpReward = getOrCreateReward(unitId,data,listener);
+        TPReward tpReward = getTPReward(unitId,data,listener);
 
         if(tpReward != null){
             tpReward.loadAd();
@@ -45,7 +44,7 @@ public class TPRewardManager extends BaseUnityPlugin {
     }
 
     public void showAd(String unitId,String sceneId){
-        TPReward tpReward = getOrCreateReward(unitId,"");
+        TPReward tpReward = getTPReward(unitId);
 
         if(tpReward != null){
             tpReward.showAd(getActivity(),sceneId);
@@ -54,7 +53,7 @@ public class TPRewardManager extends BaseUnityPlugin {
     }
 
     public void entryAdScenario(String unitId,String sceneId){
-        TPReward tpReward = getOrCreateReward(unitId,"");
+        TPReward tpReward = getTPReward(unitId);
 
         if(tpReward != null){
             tpReward.entryAdScenario(sceneId);
@@ -63,7 +62,7 @@ public class TPRewardManager extends BaseUnityPlugin {
     }
 
     public boolean isReady(String unitId){
-        TPReward tpReward = getOrCreateReward(unitId,"");
+        TPReward tpReward = getTPReward(unitId);
 
         if(tpReward != null){
             return tpReward.isReady();
@@ -74,7 +73,7 @@ public class TPRewardManager extends BaseUnityPlugin {
 
 
     public void setCustomShowData(String adUnitId,String data){
-        TPReward tpReward = getOrCreateReward(adUnitId,"");
+        TPReward tpReward = getTPReward(adUnitId);
 
         if(tpReward != null){
             tpReward.setCustomShowData(JSON.parseObject(data));
@@ -82,10 +81,10 @@ public class TPRewardManager extends BaseUnityPlugin {
     }
 
 
-    private TPReward getOrCreateReward(String adUnitId, String data) {
-        return getOrCreateReward(adUnitId,data,null);
+    private TPReward getTPReward(String adUnitId) {
+        return mTPReward.get(adUnitId);
     }
-    private TPReward getOrCreateReward(String adUnitId, String data,TPRewardListener listener) {
+    private TPReward getTPReward(String adUnitId, String data, TPRewardListener listener) {
 
         Log.i("tradplus","data = "+data+" mTPReward = "+mTPReward+" listener = "+listener);
 
@@ -97,7 +96,7 @@ public class TPRewardManager extends BaseUnityPlugin {
         HashMap<String, Object> temp = new HashMap<>();
         TPReward tpReward = mTPReward.get(adUnitId);
         if (tpReward == null) {
-            tpReward = new TPReward(getActivity(),adUnitId,extraInfo == null ? true : extraInfo.isAutoload());
+            tpReward = new TPReward(getActivity(),adUnitId);
             mTPReward.put(adUnitId, tpReward);
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
@@ -300,6 +299,14 @@ public class TPRewardManager extends BaseUnityPlugin {
                 listener.onBiddingEnd(mAdUnitId, JSON.toJSONString(tpAdInfo),JSON.toJSONString(tpAdError));
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
+        }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
         }
     }
     private class TPRewardAdListener implements RewardAdListener {

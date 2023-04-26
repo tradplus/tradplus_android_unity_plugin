@@ -10,10 +10,11 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.tradplus.ads.base.GlobalTradPlus;
+import com.tradplus.ads.base.CommonUtil;
 import com.tradplus.ads.base.bean.TPAdError;
 import com.tradplus.ads.base.bean.TPAdInfo;
 import com.tradplus.ads.base.common.TPTaskManager;
+import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.common.util.DeviceUtils;
 import com.tradplus.ads.common.util.ResourceUtils;
@@ -21,12 +22,9 @@ import com.tradplus.ads.common.util.ScreenUtil;
 import com.tradplus.ads.core.AdCacheManager;
 import com.tradplus.ads.core.cache.AdCache;
 import com.tradplus.ads.mgr.nativead.TPNativeAdRenderImpl;
-import com.tradplus.ads.mobileads.gdpr.CommonUtil;
-import com.tradplus.ads.mobileads.util.SegmentUtils;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.banner.BannerAdListener;
-import com.tradplus.ads.open.nativead.TPNative;
 import com.tradplus.ads.open.nativead.TPNativeBanner;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
 import com.tradplus.unity.plugin.common.ExtraInfo;
@@ -53,7 +51,7 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     private Map<String, TPNativeBannerInfo> mTPNativeBanner = new ConcurrentHashMap<>();
 
     public void loadAd(String unitId, String sceneId, String data, TPNativeBannerListener listener) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(unitId, data, listener).getTpNativeBanner();
+        TPNativeBanner tpNativeBanner = getTPNativeBanner(unitId, data, listener).getTpNativeBanner();
 
         if (tpNativeBanner != null) {
             tpNativeBanner.loadAd(unitId, sceneId);
@@ -62,7 +60,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     }
 
     public void closeAutoshow(String unitId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(unitId, "").getTpNativeBanner();
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(unitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
 
         if (tpNativeBanner != null) {
             tpNativeBanner.closeAutoShow();
@@ -70,7 +70,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     }
 
     public void showAd(String unitId, String sceneId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(unitId, "").getTpNativeBanner();
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(unitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
 
 
         if (tpNativeBanner != null && isReady(unitId)) {
@@ -82,8 +84,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     }
 
     public void entryAdScenario(String unitId, String sceneId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(unitId, "").getTpNativeBanner();
-
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(unitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
         if (tpNativeBanner != null) {
             tpNativeBanner.entryAdScenario(sceneId);
         }
@@ -91,7 +94,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     }
 
     public boolean isReady(String unitId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(unitId, "").getTpNativeBanner();
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(unitId);
+        if(tpNativeBannerInfo == null) return false;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
 
         if (tpNativeBanner != null) {
             return AdCacheManager.getInstance().getReadyAdNum(unitId) > 0;
@@ -101,8 +106,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     }
 
     public void hideBanner(String adUnitId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(adUnitId, "").getTpNativeBanner();
-
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(adUnitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
         TPTaskManager.getInstance().runOnMainThread(new Runnable() {
             @Override
             public void run() {
@@ -115,7 +121,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     }
 
     public void displayBanner(String adUnitId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(adUnitId, "").getTpNativeBanner();
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(adUnitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
         TPTaskManager.getInstance().runOnMainThread(new Runnable() {
             @Override
             public void run() {
@@ -128,8 +136,9 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
 
 
     public void destroyBanner(String adUnitId) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(adUnitId, "").getTpNativeBanner();
-
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(adUnitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
 
         TPTaskManager.getInstance().runOnMainThread(new Runnable() {
             @Override
@@ -148,19 +157,20 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
 
 
     public void setCustomShowData(String adUnitId, String data) {
-        TPNativeBanner tpNativeBanner = getOrCreateBanner(adUnitId, "").getTpNativeBanner();
-
+        TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(adUnitId);
+        if(tpNativeBannerInfo == null) return;
+        TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
         if (tpNativeBanner != null) {
             tpNativeBanner.setCustomShowData(JSON.parseObject(data));
         }
     }
 
 
-    private TPNativeBannerInfo getOrCreateBanner(String adUnitId, String data) {
-        return getOrCreateBanner(adUnitId, data, null);
+    private TPNativeBannerInfo getTPNativeBanner(String adUnitId) {
+        return mTPNativeBanner.get(adUnitId);
     }
 
-    private TPNativeBannerInfo getOrCreateBanner(String adUnitId, String data, TPNativeBannerListener listener) {
+    private TPNativeBannerInfo getTPNativeBanner(String adUnitId, String data, TPNativeBannerListener listener) {
 
         Log.i("tradplus", "data = " + data + " mTPNativeBanner = " + mTPNativeBanner + " listener = " + listener);
 
@@ -294,7 +304,8 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
 
         if (tpAdInfo != null && tpAdInfo.height != 0 && "audience-network".equals(tpAdInfo.adSourceName)) {
         } else {
-            TPNativeBannerInfo tpNativeBannerInfo = getOrCreateBanner(unitId, "");
+            TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(unitId);
+            if(tpNativeBannerInfo == null) return;
             TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
 
 
@@ -480,6 +491,14 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
             }
             Log.v("TradPlusSdk", "onBiddingEnd unitid=" + mAdUnitId + "=======================");
         }
+
+        @Override
+        public void onAdIsLoading(String s) {
+            if (listener != null) {
+                listener.onAdIsLoading(mAdUnitId);
+            }
+            Log.v("TradPlusSdk", "onAdIsLoading unitid=" + mAdUnitId + "=======================");
+        }
     }
 
     private class TPBannerAdListener extends BannerAdListener {
@@ -498,8 +517,8 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
                 listener.onAdLoaded(mAdUnitId, JSON.toJSONString(tpAdInfo));
             }
 
-            TPNativeBannerInfo tpNativeBannerInfo = getOrCreateBanner(mAdUnitId, "");
-
+            TPNativeBannerInfo tpNativeBannerInfo = getTPNativeBanner(mAdUnitId);
+            if(tpNativeBannerInfo == null) return;
 
             if (!tpNativeBannerInfo.isCloseAutoShow()) {
                 TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();

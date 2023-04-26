@@ -1,16 +1,6 @@
 apply plugin: 'com.android.library'
 
 
-buildscript {
-    repositories {
-        mavenCentral()
-        google()
-
-    }
-
-}
-
-
 android {
     compileSdk 30
 
@@ -35,10 +25,27 @@ android {
     }
 }
 
+android.libraryVariants.all {
+    variant-> variant.outputs.all{
+        outputFileName = "tradplus_unity_plugin."+'aar'
+    }
+        variant.getAssembleProvider().configure() {
+            it.doLast {
+                variant.outputs.all { output ->
+                    def outputPath = [project.rootDir.absolutePath, "aar"].join(File.separator)
+                    copy {
+                        from output.outputFile
+                        into outputPath
+                    }
+                }
+            }
+        }
+}
+
 dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 
     //TradPlus
-    compileOnly 'com.tradplusad:tradplus:8.7.0.1'
-
+    compileOnly 'com.tradplusad:tradplus:9.6.0.1'
+    compileOnly 'com.tradplusad:tradplus-tool:1.0.6'
 }

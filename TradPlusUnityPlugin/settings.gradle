@@ -3,9 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
-        maven {
-            url '/Users/caesar.qiu/.m2/repository'
-        }
+
     }
 }
 dependencyResolutionManagement {
@@ -13,9 +11,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url '/Users/caesar.qiu/.m2/repository'
-        }
+
     }
 }
 rootProject.name = "TradPlus Unity Plugin"
