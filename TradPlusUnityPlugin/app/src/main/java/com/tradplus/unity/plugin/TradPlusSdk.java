@@ -10,11 +10,15 @@ import com.tradplus.ads.base.common.TPPrivacyManager;
 import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.base.util.TestDeviceUtil;
 import com.tradplus.ads.common.serialization.JSON;
+import com.tradplus.ads.common.serialization.JSONArray;
 import com.tradplus.ads.common.util.Json;
 import com.tradplus.ads.core.AdCacheManager;
 import com.tradplus.ads.core.GlobalImpressionManager;
 import com.tradplus.meditaiton.utils.ImportSDKUtil;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class TradPlusSdk extends BaseUnityPlugin {
 
@@ -55,7 +59,31 @@ public class TradPlusSdk extends BaseUnityPlugin {
     }
 
     public static void setSettingDataParam(String map) {
-        com.tradplus.ads.open.TradPlusSdk.setSettingDataParam(JSON.parseObject(map));
+        try {
+            Map<String,Object> temp = JSON.parseObject(map);
+
+            if(temp != null){
+                for(Map.Entry<String, Object> entry:temp.entrySet()){
+                    Object value = entry.getValue();
+                    String key = entry.getKey();
+
+                    if(value != null && value instanceof JSONArray){
+                        ArrayList<Object> arrayList = new ArrayList<>();
+
+                        for(int i = 0; i < ((JSONArray)value).size();i++){
+                            arrayList.add(((JSONArray)value).get(i));
+                        }
+
+                        entry.setValue(arrayList);
+                    }
+                }
+
+            }
+            com.tradplus.ads.open.TradPlusSdk.setSettingDataParam(temp);
+
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
     }
 
 

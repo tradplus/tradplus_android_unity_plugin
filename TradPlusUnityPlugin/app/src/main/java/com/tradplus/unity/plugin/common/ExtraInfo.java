@@ -1,5 +1,7 @@
 package com.tradplus.unity.plugin.common;
 
+import android.util.Log;
+
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.common.serialization.JSONArray;
 import com.tradplus.ads.common.serialization.JSONObject;
@@ -73,7 +75,7 @@ public class ExtraInfo {
 
             }
         }catch (Throwable throwable){
-
+            throwable.printStackTrace();
         }
 
         this.localParams = localParams;
