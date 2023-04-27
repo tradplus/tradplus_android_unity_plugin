@@ -1,5 +1,10 @@
 package com.tradplus.unity.plugin.common;
 
+import com.tradplus.ads.common.serialization.JSON;
+import com.tradplus.ads.common.serialization.JSONArray;
+import com.tradplus.ads.common.serialization.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Map;
 
 public class ExtraInfo {
@@ -43,10 +48,34 @@ public class ExtraInfo {
     }
 
     public Map<String, Object> getLocalParams() {
+
         return localParams;
     }
 
     public void setLocalParams(Map<String, Object> localParams) {
+        try {
+            if(localParams != null){
+                for(Map.Entry<String, Object> entry:localParams.entrySet()){
+                    Object value = entry.getValue();
+                    String key = entry.getKey();
+
+                    if(value != null && value instanceof JSONArray){
+                        ArrayList<Object> arrayList = new ArrayList<>();
+
+                        for(int i = 0; i < ((JSONArray)value).size();i++){
+                            arrayList.add(((JSONArray)value).get(i));
+                        }
+
+                        entry.setValue(arrayList);
+//                    localParams.put(key,arrayList);
+                    }
+                }
+
+            }
+        }catch (Throwable throwable){
+
+        }
+
         this.localParams = localParams;
     }
 

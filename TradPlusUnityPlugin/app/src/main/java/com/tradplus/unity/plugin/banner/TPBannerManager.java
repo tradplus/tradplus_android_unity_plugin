@@ -48,7 +48,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     private Map<String, TPBanner> mTPBanner = new ConcurrentHashMap<>();
 
     public void loadAd(String unitId, String sceneId, String data, TPBannerListener listener) {
-        TPBanner tpBanner = getOrCreateBanner(unitId, data, listener);
+        TPBanner tpBanner = getTPBanner(unitId, data, listener);
 
         if (tpBanner != null) {
             tpBanner.loadAd(unitId, sceneId);
@@ -57,7 +57,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
     public void closeAutoshow(String unitId) {
-        TPBanner tpBanner = getOrCreateBanner(unitId, "");
+        TPBanner tpBanner = getTPBanner(unitId);
 
         if (tpBanner != null) {
             tpBanner.closeAutoShow();
@@ -65,7 +65,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
     public void showAd(String unitId, String sceneId) {
-        TPBanner tpBanner = getOrCreateBanner(unitId, "");
+        TPBanner tpBanner = getTPBanner(unitId);
 
         if (tpBanner != null) {
             tpBanner.showAd();
@@ -74,7 +74,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
     public void entryAdScenario(String unitId, String sceneId) {
-        TPBanner tpBanner = getOrCreateBanner(unitId, "");
+        TPBanner tpBanner = getTPBanner(unitId);
 
         if (tpBanner != null) {
             tpBanner.entryAdScenario(sceneId);
@@ -83,7 +83,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
     public boolean isReady(String unitId) {
-        TPBanner tpBanner = getOrCreateBanner(unitId, "");
+        TPBanner tpBanner = getTPBanner(unitId);
 
         if (tpBanner != null) {
             return AdCacheManager.getInstance().getReadyAdNum(unitId) > 0;
@@ -93,7 +93,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
     public void hideBanner(String adUnitId) {
-        TPBanner tpBanner = getOrCreateBanner(adUnitId, "");
+        TPBanner tpBanner = getTPBanner(adUnitId);
 
         TPTaskManager.getInstance().runOnMainThread(new Runnable() {
             @Override
@@ -107,7 +107,7 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
     public void displayBanner(String adUnitId) {
-        TPBanner tpBanner = getOrCreateBanner(adUnitId, "");
+        TPBanner tpBanner = getTPBanner(adUnitId);
         TPTaskManager.getInstance().runOnMainThread(new Runnable() {
             @Override
             public void run() {
@@ -120,7 +120,7 @@ public class TPBannerManager extends BaseUnityPlugin {
 
 
     public void destroyBanner(String adUnitId) {
-        TPBanner tpBanner = getOrCreateBanner(adUnitId, "");
+        TPBanner tpBanner = getTPBanner(adUnitId);
 
 
         TPTaskManager.getInstance().runOnMainThread(new Runnable() {
@@ -138,8 +138,8 @@ public class TPBannerManager extends BaseUnityPlugin {
 
     }
 
-    public void setCustomShowData(String adUnitId, String data) {
-        TPBanner tpBanner = getOrCreateBanner(adUnitId, "");
+    public void setCustomShowData(String adUnitId,String data) {
+        TPBanner tpBanner = getTPBanner(adUnitId);
 
         if (tpBanner != null) {
             tpBanner.setCustomShowData(JSON.parseObject(data));
@@ -147,11 +147,11 @@ public class TPBannerManager extends BaseUnityPlugin {
     }
 
 
-    private TPBanner getOrCreateBanner(String adUnitId, String data) {
-        return getOrCreateBanner(adUnitId, data, null);
+    private TPBanner getTPBanner(String adUnitId) {
+        return mTPBanner.get(adUnitId);
     }
 
-    private TPBanner getOrCreateBanner(String adUnitId, String data, TPBannerListener listener) {
+    private TPBanner getTPBanner(String adUnitId, String data, TPBannerListener listener) {
 
         Log.i("tradplus", "data = " + data + " mTPBanner = " + mTPBanner + " listener = " + listener);
 

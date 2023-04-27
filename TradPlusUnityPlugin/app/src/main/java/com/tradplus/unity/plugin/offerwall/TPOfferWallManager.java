@@ -34,7 +34,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     private Map<String, TPOfferWall> mTPOfferWall = new ConcurrentHashMap<>();
 
     public void loadAd(String unitId, String data, TPOfferWallListener listener){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,data,listener);
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId,data,listener);
 
         if(tpOfferWall != null){
             tpOfferWall.loadAd();
@@ -43,7 +43,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     }
 
     public void showAd(String unitId,String sceneId){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             tpOfferWall.showAd(getActivity(),sceneId);
@@ -52,7 +52,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     }
 
     public void entryAdScenario(String unitId,String sceneId){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             tpOfferWall.entryAdScenario(sceneId);
@@ -61,7 +61,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     }
 
     public boolean isReady(String unitId){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             return tpOfferWall.isReady();
@@ -72,7 +72,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     }
 
     public void getCurrencyBalance(String unitId){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             tpOfferWall.getCurrencyBalance();
@@ -80,7 +80,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
 
     }
     public void spendCurrency(String unitId,int balance){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             tpOfferWall.spendCurrency(balance);
@@ -88,7 +88,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
 
     }
     public void awardCurrency(String unitId,int balance){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             tpOfferWall.awardCurrency(balance);
@@ -96,7 +96,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
 
     }
     public void setUserId(String unitId,String userId){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(unitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(unitId);
 
         if(tpOfferWall != null){
             tpOfferWall.setUserId(userId);
@@ -106,7 +106,7 @@ public class TPOfferWallManager extends BaseUnityPlugin {
 
 
     public void setCustomShowData(String adUnitId,String data){
-        TPOfferWall tpOfferWall = getOrCreateOfferWall(adUnitId,"");
+        TPOfferWall tpOfferWall = getTPOfferWall(adUnitId);
 
         if(tpOfferWall != null){
             tpOfferWall.setCustomShowData(JSON.parseObject(data));
@@ -114,10 +114,10 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     }
 
 
-    private TPOfferWall getOrCreateOfferWall(String adUnitId, String data) {
-        return getOrCreateOfferWall(adUnitId,data,null);
+    private TPOfferWall getTPOfferWall(String adUnitId) {
+        return mTPOfferWall.get(adUnitId);
     }
-    private TPOfferWall getOrCreateOfferWall(String adUnitId, String data,TPOfferWallListener listener) {
+    private TPOfferWall getTPOfferWall(String adUnitId, String data, TPOfferWallListener listener) {
 
         Log.i("tradplus","data = "+data+" mTPOfferWall = "+mTPOfferWall+" listener = "+listener);
 

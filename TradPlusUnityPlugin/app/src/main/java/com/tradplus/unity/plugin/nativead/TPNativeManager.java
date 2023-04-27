@@ -79,7 +79,7 @@ public class TPNativeManager extends BaseUnityPlugin {
 
         TPNative tpNative = tpNativeInfo.getTpNative();
         if (tpNative != null) {
-            return AdCacheManager.getInstance().getReadyAdNum(unitId) > 0;
+            return tpNative.isReady();
         }
 
         return false;
