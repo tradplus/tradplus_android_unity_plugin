@@ -108,7 +108,7 @@ public class TradPlusSdk extends BaseUnityPlugin {
     }
 
 
-    public static void showGDPRDialog(TPGDPRDialogListener tpgdprAuthListener) {
+    public static void showGDPRDialog(TPGDPRDialogListener tpgdprAuthListener,String url) {
         com.tradplus.ads.open.TradPlusSdk.showUploadDataNotifyDialog(getActivity(), new com.tradplus.ads.open.TradPlusSdk.TPGDPRAuthListener() {
             @Override
             public void onAuthResult(int i) {
@@ -116,12 +116,12 @@ public class TradPlusSdk extends BaseUnityPlugin {
                     tpgdprAuthListener.onAuthResult(i);
                 }
             }
-        }, Const.URL.GDPR_URL);
+        },url);
     }
 
     public static String getSdkVersion() {
         try {
-            return TPDataManager.getInstance().getSdkVersion();
+            return com.tradplus.ads.open.TradPlusSdk.getSdkVersion();
         } catch (Throwable throwable) {
 
         }
@@ -188,13 +188,7 @@ public class TradPlusSdk extends BaseUnityPlugin {
     }
 
     public static void clearCache(String unitId) {
-        try {
-            int readyAdNum = AdCacheManager.getInstance().getReadyAdNum(unitId);
-            AdCacheManager.getInstance().removeEndCache(unitId, readyAdNum);
-
-        } catch (Throwable throwable) {
-
-        }
+        com.tradplus.ads.open.TradPlusSdk.clearCache(unitId);
     }
 
     public static void setPrivacyUserAgree(boolean open) {

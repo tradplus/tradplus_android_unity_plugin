@@ -86,7 +86,7 @@ public class TPBannerManager extends BaseUnityPlugin {
         TPBanner tpBanner = getTPBanner(unitId);
 
         if (tpBanner != null) {
-            return AdCacheManager.getInstance().getReadyAdNum(unitId) > 0;
+            return tpBanner.isReady();
         }
 
         return false;

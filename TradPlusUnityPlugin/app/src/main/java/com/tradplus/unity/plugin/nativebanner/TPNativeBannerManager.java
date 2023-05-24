@@ -99,7 +99,7 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
         TPNativeBanner tpNativeBanner = tpNativeBannerInfo.getTpNativeBanner();
 
         if (tpNativeBanner != null) {
-            return AdCacheManager.getInstance().getReadyAdNum(unitId) > 0;
+            return tpNativeBanner.isReady();
         }
 
         return false;

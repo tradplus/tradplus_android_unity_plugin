@@ -134,10 +134,10 @@ public class TPOfferWallManager extends BaseUnityPlugin {
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
 
-            tpOfferWall.setAdListener(new TPOfferWallManager.TPOfferWallAdListener(adUnitId,listener));
+            tpOfferWall.setAdListener(new TPOfferWallAdListener(adUnitId,listener));
             if (!isSimpleListener) {
 
-                tpOfferWall.setAllAdLoadListener(new TPOfferWallManager.TPOfferWallAllAdListener(adUnitId, listener));
+                tpOfferWall.setAllAdLoadListener(new TPOfferWallAllAdListener(adUnitId, listener));
                 tpOfferWall.setOffWallBalanceListener(new TPOfferWallBalanceListener(adUnitId, listener));
             }
 
