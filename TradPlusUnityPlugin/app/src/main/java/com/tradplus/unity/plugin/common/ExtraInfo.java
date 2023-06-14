@@ -18,12 +18,22 @@ public class ExtraInfo {
     private String className;
     private boolean isAutoload;
     private boolean closeAutoShow;
+    private boolean needToClose;
     private float x;
     private float y;
     private float width;
     private float height;
     private int adPosition;
     private boolean isSimpleListener;
+
+
+    public boolean isNeedToClose() {
+        return needToClose;
+    }
+
+    public void setNeedToClose(boolean needToClose) {
+        this.needToClose = needToClose;
+    }
 
     public boolean isAutoload() {
         return isAutoload;

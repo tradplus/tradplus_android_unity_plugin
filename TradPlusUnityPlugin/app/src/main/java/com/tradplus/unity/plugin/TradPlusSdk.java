@@ -208,15 +208,6 @@ public class TradPlusSdk extends BaseUnityPlugin {
         }
     }
 
-    public static void setTestDevice(boolean isTestDevice, String testModeId) {
-        try {
-            TestDeviceUtil.getInstance().setNeedTestDevice(isTestDevice, testModeId);
-
-        } catch (Throwable throwable) {
-
-        }
-    }
-
     public static void setAutoExpiration(boolean isAuto) {
         com.tradplus.ads.open.TradPlusSdk.setAutoExpiration(isAuto);
     }
