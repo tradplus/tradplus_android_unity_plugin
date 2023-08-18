@@ -1,16 +1,18 @@
-package com.tradplus.unity.plugin.interstitial;
+package com.tradplus.unity.plugin.splash;
 
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.tradplus.ads.base.bean.TPAdError;
 import com.tradplus.ads.base.bean.TPAdInfo;
+import com.tradplus.ads.base.bean.TPBaseAd;
 import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
-import com.tradplus.ads.open.interstitial.InterstitialAdListener;
-import com.tradplus.ads.open.interstitial.TPInterstitial;
+import com.tradplus.ads.open.splash.SplashAdListener;
+import com.tradplus.ads.open.splash.TPSplash;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
 import com.tradplus.unity.plugin.common.ExtraInfo;
 
@@ -18,59 +20,69 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TPInterstitialManager extends BaseUnityPlugin {
-    private static TPInterstitialManager sInstance;
+public class TPSplashManager extends BaseUnityPlugin {
+    private static TPSplashManager sInstance;
 
-    private TPInterstitialManager() {
+    private TPSplashManager() {
     }
 
-    public synchronized static TPInterstitialManager getInstance() {
+    public synchronized static TPSplashManager getInstance() {
         if (sInstance == null) {
-            sInstance = new TPInterstitialManager();
+            sInstance = new TPSplashManager();
         }
         return sInstance;
     }
 
     // 保存广告位对象
-    private Map<String, TPInterstitial> mTPInterstitial = new ConcurrentHashMap<>();
+    private Map<String, TPSplash> mTPSplash = new ConcurrentHashMap<>();
 
-    public void loadAd(String unitId, String data, TPInterstitialListener listener) {
-        TPInterstitial tpInterstitial = getTPInterstitial(unitId, data, listener);
+    public void loadAd(String unitId, String data, TPSplashListener listener) {
+        TPSplash tpSplash = getTPSplash(unitId, data, listener);
 
         ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
-        if(extraInfo != null){
-            tpInterstitial.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+        if (extraInfo != null) {
+            tpSplash.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
         }
 
-        if (tpInterstitial != null) {
-            tpInterstitial.loadAd(extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
+        if (tpSplash != null) {
+            tpSplash.loadAd(null, extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
 
     }
 
     public void showAd(String unitId, String sceneId) {
-        TPInterstitial tpInterstitial = getTPInterstitial(unitId);
+        TPSplash tpSplash = getTPSplash(unitId);
 
-        if (tpInterstitial != null) {
-            tpInterstitial.showAd(getActivity(), sceneId);
+        if (tpSplash != null) {
+            if (tpSplash.isReady()) {
+                showSplash(unitId, sceneId);
+
+            }
         }
 
     }
 
-    public void entryAdScenario(String unitId, String sceneId) {
-        TPInterstitial tpInterstitial = getTPInterstitial(unitId);
+    private void showSplash(String unitId, String sceneId) {
+        Intent i = new Intent(getActivity(), TPSplashShowActivity.class);
+        i.putExtra("unitId", unitId);
+        i.putExtra("sceneId", sceneId);
+        getActivity().startActivity(i);
+    }
 
-        if (tpInterstitial != null) {
-            tpInterstitial.entryAdScenario(sceneId);
+    public void entryAdScenario(String unitId, String sceneId) {
+        TPSplash tpSplash = getTPSplash(unitId);
+
+        if (tpSplash != null) {
+            tpSplash.entryAdScenario(sceneId);
         }
 
     }
 
     public boolean isReady(String unitId) {
-        TPInterstitial tpInterstitial = getTPInterstitial(unitId);
+        TPSplash tpSplash = getTPSplash(unitId);
 
-        if (tpInterstitial != null) {
-            return tpInterstitial.isReady();
+        if (tpSplash != null) {
+            return tpSplash.isReady();
         }
 
         return false;
@@ -78,21 +90,23 @@ public class TPInterstitialManager extends BaseUnityPlugin {
 
 
     public void setCustomShowData(String adUnitId, String data) {
-        TPInterstitial tpInterstitial = getTPInterstitial(adUnitId);
+        TPSplash tpSplash = getTPSplash(adUnitId);
 
-        if (tpInterstitial != null) {
-            tpInterstitial.setCustomShowData(JSON.parseObject(data));
+        if (tpSplash != null) {
+            tpSplash.setCustomShowData(JSON.parseObject(data));
         }
     }
 
 
-    private TPInterstitial getTPInterstitial(String adUnitId) {
-        return mTPInterstitial.get(adUnitId);
+    public TPSplash getTPSplash(String adUnitId) {
+        Log.i("tradplus", "adUnitId = " + adUnitId);
+        if (TextUtils.isEmpty(adUnitId)) return null;
+        return mTPSplash.get(adUnitId);
     }
 
-    private TPInterstitial getTPInterstitial(String adUnitId, String data, TPInterstitialListener listener) {
+    private TPSplash getTPSplash(String adUnitId, String data, TPSplashListener listener) {
 
-        Log.i("tradplus", "data = " + data + " mTPInterstitial = " + mTPInterstitial + " listener = " + listener);
+        Log.i("tradplus", "data = " + data + " mTPSplash = " + mTPSplash + " listener = " + listener);
 
         ExtraInfo extraInfo = null;
         if (!TextUtils.isEmpty(data)) {
@@ -100,22 +114,24 @@ public class TPInterstitialManager extends BaseUnityPlugin {
         }
 
         HashMap<String, Object> temp = new HashMap<>();
-
-        TPInterstitial tpInterstitial = mTPInterstitial.get(adUnitId);
-        if (tpInterstitial == null) {
-            tpInterstitial = new TPInterstitial(getActivity(), adUnitId);
-            mTPInterstitial.put(adUnitId, tpInterstitial);
+        TPSplash tpSplash = mTPSplash.get(adUnitId);
+        if (tpSplash == null) {
+            tpSplash = new TPSplash(getActivity(), adUnitId);
+            mTPSplash.put(adUnitId, tpSplash);
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
 
-            tpInterstitial.setAdListener(new TPInterstitialAdListener(adUnitId, listener));
+            tpSplash.setAdListener(new TPSplashManager.TPSplashAdListener(adUnitId, listener));
             if (!isSimpleListener) {
-                tpInterstitial.setAllAdLoadListener(new TPInterstitialdAllAdListener(adUnitId, listener));
-                tpInterstitial.setDownloadListener(new TPInterstitialDownloadListener(adUnitId, listener));
+
+                tpSplash.setAllAdLoadListener(new TPSplashManager.TPSplashAllAdListener(adUnitId, listener));
+                tpSplash.setDownloadListener(new TPSplashManager.TPSplashDownloadListener(adUnitId, listener));
+
             }
 
         }
-
+//        LogUtil.ownShow("map params = "+params);
+//        // 同一个广告位每次load参数不一样，在下面设置
         if (extraInfo != null) {
 
             if (extraInfo.getLocalParams() != null) {
@@ -128,22 +144,21 @@ public class TPInterstitialManager extends BaseUnityPlugin {
                 temp.put("user_id", extraInfo.getUserId());
             }
 
-            tpInterstitial.setCustomParams(temp);
+            tpSplash.setCustomParams(temp);
 
             if (extraInfo.getCustomMap() != null) {
                 SegmentUtils.initPlacementCustomMap(adUnitId, extraInfo.getCustomMap());
             }
         }
 
-        return tpInterstitial;
+        return tpSplash;
     }
 
-
-    private class TPInterstitialDownloadListener implements DownloadListener {
+    private class TPSplashDownloadListener implements DownloadListener {
         private String mAdUnitId;
-        private TPInterstitialListener listener;
+        private TPSplashListener listener;
 
-        TPInterstitialDownloadListener(String adUnitId, TPInterstitialListener listener) {
+        TPSplashDownloadListener(String adUnitId, TPSplashListener listener) {
             mAdUnitId = adUnitId;
             this.listener = listener;
         }
@@ -197,11 +212,11 @@ public class TPInterstitialManager extends BaseUnityPlugin {
         }
     }
 
-    public class TPInterstitialdAllAdListener implements LoadAdEveryLayerListener {
+    public class TPSplashAllAdListener implements LoadAdEveryLayerListener {
         private String mAdUnitId;
-        private TPInterstitialListener listener;
+        private TPSplashListener listener;
 
-        TPInterstitialdAllAdListener(String adUnitId, TPInterstitialListener listener) {
+        TPSplashAllAdListener(String adUnitId, TPSplashListener listener) {
             mAdUnitId = adUnitId;
             this.listener = listener;
         }
@@ -272,17 +287,17 @@ public class TPInterstitialManager extends BaseUnityPlugin {
         }
     }
 
-    private class TPInterstitialAdListener implements InterstitialAdListener {
+    private class TPSplashAdListener extends SplashAdListener {
         private String mAdUnitId;
-        private TPInterstitialListener listener;
+        private TPSplashListener listener;
 
-        TPInterstitialAdListener(String adUnitId, TPInterstitialListener listener) {
+        TPSplashAdListener(String adUnitId, TPSplashListener listener) {
             mAdUnitId = adUnitId;
             this.listener = listener;
         }
 
         @Override
-        public void onAdLoaded(TPAdInfo tpAdInfo) {
+        public void onAdLoaded(TPAdInfo tpAdInfo, TPBaseAd tpBaseAd) {
             if (listener != null) {
                 listener.onAdLoaded(mAdUnitId, JSON.toJSONString(tpAdInfo));
             }
@@ -302,6 +317,11 @@ public class TPInterstitialManager extends BaseUnityPlugin {
             if (listener != null) {
                 listener.onAdClosed(mAdUnitId, JSON.toJSONString(tpAdInfo));
             }
+
+            if (TPSplashShowActivity.instance != null) {
+                TPSplashShowActivity.instance.finish();
+                TPSplashShowActivity.instance = null;
+            }
             Log.v("TradPlusSdk", "onAdClosed unitid=" + mAdUnitId + "=======================");
         }
 
@@ -314,34 +334,25 @@ public class TPInterstitialManager extends BaseUnityPlugin {
         }
 
         @Override
-        public void onAdFailed(TPAdError tpAdError) {
+        public void onAdLoadFailed(TPAdError tpAdError) {
             if (listener != null) {
-                listener.onAdFailed(mAdUnitId, JSON.toJSONString(tpAdError));
+                listener.onAdLoadFailed(mAdUnitId, JSON.toJSONString(tpAdError));
             }
         }
 
         @Override
-        public void onAdVideoError(TPAdInfo tpAdInfo, TPAdError tpAdError) {
+        public void onZoomOutEnd(TPAdInfo tpAdInfo) {
             if (listener != null) {
-                listener.onAdVideoError(mAdUnitId, JSON.toJSONString(tpAdInfo), JSON.toJSONString(tpAdError));
+                listener.onZoomOutEnd(mAdUnitId, JSON.toJSONString(tpAdInfo));
             }
-            Log.v("TradPlusSdk", "onAdVideoError unitid=" + mAdUnitId + "=======================");
         }
 
         @Override
-        public void onAdVideoStart(TPAdInfo tpAdInfo) {
+        public void onZoomOutStart(TPAdInfo tpAdInfo) {
             if (listener != null) {
-                listener.onAdVideoStart(mAdUnitId, JSON.toJSONString(tpAdInfo));
+                listener.onZoomOutStart(mAdUnitId, JSON.toJSONString(tpAdInfo));
             }
-            Log.v("TradPlusSdk", "onAdVideoStart unitid=" + mAdUnitId + "=======================");
         }
 
-        @Override
-        public void onAdVideoEnd(TPAdInfo tpAdInfo) {
-            if (listener != null) {
-                listener.onAdVideoEnd(mAdUnitId, JSON.toJSONString(tpAdInfo));
-            }
-            Log.v("TradPlusSdk", "onAdVideoEnd unitid=" + mAdUnitId + "=======================");
-        }
     }
 }

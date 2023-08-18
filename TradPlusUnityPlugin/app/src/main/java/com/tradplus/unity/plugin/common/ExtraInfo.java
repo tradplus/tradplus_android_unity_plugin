@@ -1,5 +1,6 @@
 package com.tradplus.unity.plugin.common;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.tradplus.ads.common.serialization.JSON;
@@ -24,6 +25,10 @@ public class ExtraInfo {
     private float width;
     private float height;
     private int adPosition;
+
+    private boolean openAutoLoadCallback;
+    private float maxWaitTime;
+
     private boolean isSimpleListener;
 
 
@@ -166,5 +171,34 @@ public class ExtraInfo {
 
     public void setSimpleListener(boolean simpleListener) {
         isSimpleListener = simpleListener;
+    }
+
+    public static ExtraInfo getExtraInfo(String data) {
+        try {
+            if (!TextUtils.isEmpty(data)) {
+                return JSON.parseObject(data, ExtraInfo.class);
+            }
+        } catch (Throwable throwable) {
+
+        }
+
+
+        return null;
+    }
+
+    public boolean isOpenAutoLoadCallback() {
+        return openAutoLoadCallback;
+    }
+
+    public void setOpenAutoLoadCallback(boolean openAutoLoadCallback) {
+        this.openAutoLoadCallback = openAutoLoadCallback;
+    }
+
+    public float getMaxWaitTime() {
+        return maxWaitTime;
+    }
+
+    public void setMaxWaitTime(float maxWaitTime) {
+        this.maxWaitTime = maxWaitTime;
     }
 }

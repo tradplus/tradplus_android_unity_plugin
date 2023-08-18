@@ -23,6 +23,7 @@ import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.banner.BannerAdListener;
 import com.tradplus.ads.open.banner.TPBanner;
+import com.tradplus.unity.plugin.TPUtils;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
 import com.tradplus.unity.plugin.common.ExtraInfo;
 
@@ -51,7 +52,11 @@ public class TPBannerManager extends BaseUnityPlugin {
         TPBanner tpBanner = getTPBanner(unitId, data, listener);
 
         if (tpBanner != null) {
-            tpBanner.loadAd(unitId, sceneId);
+            ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
+            if(extraInfo != null){
+                tpBanner.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+            }
+            tpBanner.loadAd(unitId, sceneId,extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
 
     }
@@ -207,7 +212,7 @@ public class TPBannerManager extends BaseUnityPlugin {
                     mLayout = ScreenUtil.prepLayout(hasPosition ? 0 : (finalExtraInfo == null ? 0 : finalExtraInfo.getAdPosition()), mLayout, getActivity());
 
                     getActivity().addContentView(mLayout,
-                            new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                     mLayout.removeAllViews();
 
                     mLayout.setVisibility(RelativeLayout.VISIBLE);
@@ -221,16 +226,24 @@ public class TPBannerManager extends BaseUnityPlugin {
 
                     mLayout.addView(finalTpBanner);
 
-                    RelativeLayout.LayoutParams params =
-                            (RelativeLayout.LayoutParams) finalTpBanner.getLayoutParams();
+                    ViewGroup.LayoutParams params = finalTpBanner.getLayoutParams();
 
                     float density = ScreenUtil.getScreenDensity(getActivity());
 
+                    int screenWidth = TPUtils.getScreenWidth(getActivity());
                     if(finalExtraInfo != null) {
-                        params.width = (int) (finalExtraInfo.getWidth() * density);
-                        params.height = (int) (finalExtraInfo.getHeight() * density);
+                        float width = finalExtraInfo.getWidth();
+                        float height = finalExtraInfo.getHeight();
+
+                        if (width != 0 || height != 0) {
+                            params.width = (int) (width * density);
+                            params.height = (int) (height * density);
+                        } else {
+                            params.width = screenWidth;
+                            params.height = (int) (50 * density);
+                        }
                     }else{
-                        params.width = (int) (320 * density);
+                        params.width = screenWidth;
                         params.height = (int) (50 * density);
                     }
 

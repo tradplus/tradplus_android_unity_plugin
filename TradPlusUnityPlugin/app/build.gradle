@@ -46,6 +46,6 @@ dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 
     //TradPlus
-    compileOnly 'com.tradplusad:tradplus:9.8.0.1'
-    compileOnly 'com.tradplusad:tradplus-tool:1.0.6'
+    compileOnly 'com.tradplusad:tradplus:10.0.1.1'
+    compileOnly 'com.tradplusad:tradplus-tool:1.0.7'
 }

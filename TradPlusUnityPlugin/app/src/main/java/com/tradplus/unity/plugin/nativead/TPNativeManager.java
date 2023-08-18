@@ -48,8 +48,13 @@ public class TPNativeManager extends BaseUnityPlugin {
     public void loadAd(String unitId, String data, TPNativeListener listener) {
         TPNative tpNative = getTPNative(unitId, data, listener).getTpNative();
 
+        ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
+        if(extraInfo != null){
+            tpNative.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+        }
+
         if (tpNative != null) {
-            tpNative.loadAd();
+            tpNative.loadAd(extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
 
     }

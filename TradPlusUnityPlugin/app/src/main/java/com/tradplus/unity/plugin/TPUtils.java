@@ -2,6 +2,9 @@ package com.tradplus.unity.plugin;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Point;
+import android.os.Build;
+import android.view.WindowManager;
 
 import com.tradplus.ads.base.bean.TPAdError;
 import com.tradplus.ads.base.bean.TPAdInfo;
@@ -48,5 +51,27 @@ public class TPUtils {
     public static int dip2px(Context context, double dipValue) {
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5);
+    }
+
+    /**
+     * 屏幕高度
+     * @return the height of screen, in pixel
+     */
+    public static int getScreenWidth(Context context) {
+        try {
+            WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Point point = new Point();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                //noinspection ConstantConditions
+                wm.getDefaultDisplay().getRealSize(point);
+            } else {
+                //noinspection ConstantConditions
+                wm.getDefaultDisplay().getSize(point);
+            }
+            return point.x;
+        }catch(Throwable throwable) {
+            throwable.printStackTrace();
+            return 0;
+        }
     }
 }

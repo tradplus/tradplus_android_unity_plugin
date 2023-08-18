@@ -49,8 +49,13 @@ public class TPInterActiveManager extends BaseUnityPlugin {
     public void loadAd(String unitId, String data, TPInterActiveListener listener) {
         TPInterActive tpInterActive = getTPInterActive(unitId, data, listener).getTpInterActive();
 
+
+        ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
+        if(extraInfo != null){
+            tpInterActive.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+        }
         if (tpInterActive != null) {
-            tpInterActive.loadAd();
+            tpInterActive.loadAd(extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
     }
 

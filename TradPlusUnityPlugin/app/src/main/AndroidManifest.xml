@@ -3,4 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tradplus.unity.plugin">
 
+
+<!--<application>-->
+<!--  开发者在外部引用 <activity-->
+<!--            android:name=".splash.TPSplashShowActivity"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />-->
+
+<!--    </application>-->
+
 </manifest>

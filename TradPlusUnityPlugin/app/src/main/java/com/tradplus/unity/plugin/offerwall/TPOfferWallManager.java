@@ -36,8 +36,13 @@ public class TPOfferWallManager extends BaseUnityPlugin {
     public void loadAd(String unitId, String data, TPOfferWallListener listener){
         TPOfferWall tpOfferWall = getTPOfferWall(unitId,data,listener);
 
+        ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
+        if(extraInfo != null){
+            tpOfferWall.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+        }
+
         if(tpOfferWall != null){
-            tpOfferWall.loadAd();
+            tpOfferWall.loadAd(extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
 
     }
@@ -134,10 +139,10 @@ public class TPOfferWallManager extends BaseUnityPlugin {
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
 
-            tpOfferWall.setAdListener(new TPOfferWallAdListener(adUnitId,listener));
+            tpOfferWall.setAdListener(new TPOfferWallManager.TPOfferWallAdListener(adUnitId,listener));
             if (!isSimpleListener) {
 
-                tpOfferWall.setAllAdLoadListener(new TPOfferWallAllAdListener(adUnitId, listener));
+                tpOfferWall.setAllAdLoadListener(new TPOfferWallManager.TPOfferWallAllAdListener(adUnitId, listener));
                 tpOfferWall.setOffWallBalanceListener(new TPOfferWallBalanceListener(adUnitId, listener));
             }
 

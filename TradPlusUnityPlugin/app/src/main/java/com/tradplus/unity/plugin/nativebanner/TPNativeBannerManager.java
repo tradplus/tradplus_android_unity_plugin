@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.tradplus.ads.base.CommonUtil;
@@ -26,6 +24,7 @@ import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.banner.BannerAdListener;
 import com.tradplus.ads.open.nativead.TPNativeBanner;
+import com.tradplus.unity.plugin.TPUtils;
 import com.tradplus.unity.plugin.common.BaseUnityPlugin;
 import com.tradplus.unity.plugin.common.ExtraInfo;
 
@@ -53,8 +52,13 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
     public void loadAd(String unitId, String sceneId, String data, TPNativeBannerListener listener) {
         TPNativeBanner tpNativeBanner = getTPNativeBanner(unitId, data, listener).getTpNativeBanner();
 
+        ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
+        if(extraInfo != null){
+            tpNativeBanner.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+        }
+
         if (tpNativeBanner != null) {
-            tpNativeBanner.loadAd(unitId, sceneId);
+            tpNativeBanner.loadAd(unitId, sceneId,extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
 
     }
@@ -196,10 +200,10 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
             }
 
             tpNativeBannerInfo.setCloseAutoShow(closeAutoShow);
-            tpNativeBannerInfo.setWidth(extraInfo == null ? 0 : extraInfo.getWidth());
-            tpNativeBannerInfo.setHeight(extraInfo == null ? 0 : extraInfo.getHeight());
+            tpNativeBannerInfo.setWidth(extraInfo == null ? DeviceUtils.getScreenWidth(getActivity()) : extraInfo.getWidth());
+            tpNativeBannerInfo.setHeight(extraInfo == null ? 50 : extraInfo.getHeight());
 
-
+            Log.i("nativebanner", "setWidth: " +tpNativeBannerInfo.getWidth());
             String className = extraInfo == null ? "" : (TextUtils.isEmpty(extraInfo.getClassName()) ? "" : extraInfo.getClassName());
 
             if (!TextUtils.isEmpty(className)) {
@@ -241,11 +245,18 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
                     mMainRelativeLayout = ScreenUtil.prepLayout(hasPosition ? 0 : (finalExtraInfo == null ? 0 : finalExtraInfo.getAdPosition()), mMainRelativeLayout, getActivity());
 
                     getActivity().addContentView(mMainRelativeLayout,
-                            new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                            new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
                     mMainRelativeLayout.removeAllViews();
                     mRelativeLayout = new RelativeLayout(getActivity());
-                    mRelativeLayout.setLayoutParams(new RelativeLayout.LayoutParams((int) (finalExtraInfo == null ? 0 : (int) finalExtraInfo.getWidth() * density), ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                    int layoutParamsWidth = ViewGroup.LayoutParams.MATCH_PARENT;
+                    if (finalExtraInfo != null && finalExtraInfo.getWidth() != 0) {
+                        layoutParamsWidth = (int) (finalExtraInfo.getWidth() * density);
+                    }
+                    Log.i("nativebanner", "layoutParamsWidth: " +layoutParamsWidth);
+
+                    mRelativeLayout.setLayoutParams(new ViewGroup.LayoutParams(layoutParamsWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
 
                     mRelativeLayout.removeAllViews();
                     if (finalTpBanner.getParent() != null) {
@@ -320,44 +331,40 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
                         float width = tpNativeBannerInfo.getWidth();
                         float height = tpNativeBannerInfo.getHeight();
 
-                        if (width == 0 && height == 0) {
-                            width = 320;
-                            height = 50;
-                        }
+                        int screenWidth = TPUtils.getScreenWidth(getActivity());
+
                         // 获取nativebanner对应的布局
                         View viewById = tpNativeBanner.findViewById(CommonUtil.getResId(getActivity(), "tp_ll_nativebanner", "id"));
                         View ad_Choices = tpNativeBanner.findViewById(CommonUtil.getResId(getActivity(), "tp_ll_ad_choices", "id"));
 
                         if(ad_Choices != null){
-                            LinearLayout.LayoutParams paramsChoices =
-                                    (LinearLayout.LayoutParams) ad_Choices.getLayoutParams();
-                            if (width == -1) {
-                                paramsChoices.width = DeviceUtils.getScreenWidth(getActivity());
+                            ViewGroup.LayoutParams paramsChoices = ad_Choices.getLayoutParams();
+                            if (width == 0) {
+                                paramsChoices.width = screenWidth;
                             } else {
                                 paramsChoices.width = (int) (width * density);
                             }
-
+                            Log.i("nativebanner", "paramsChoices.width: " +paramsChoices.width);
                             ad_Choices.setLayoutParams(paramsChoices);
                         }
 
-                        if(viewById != null){
-                            LinearLayout.LayoutParams params =
-                                    (LinearLayout.LayoutParams) viewById.getLayoutParams();
 
-                            if (width == -1) {
-                                params.width = DeviceUtils.getScreenWidth(getActivity());
+                        if(viewById != null){
+                            ViewGroup.LayoutParams params = viewById.getLayoutParams();
+
+                            if (width == 0) {
+                                params.width =  screenWidth;
                             } else {
                                 params.width = (int) (width * density);
                             }
-
+                            Log.i("nativebanner", "params.width: " +params.width);
+                            if (height == 0) {
+                                height = 50;
+                            }
                             params.height = (int) (height * density);
-
-
 
                             viewById.setLayoutParams(params);
                         }
-
-
 
                     }
                 });
@@ -365,6 +372,8 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
             }
         }
     }
+
+
 
 
     private class TPBannerDownloadListener implements DownloadListener {

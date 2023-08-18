@@ -208,8 +208,13 @@ public class TradPlusSdk extends BaseUnityPlugin {
         }
     }
 
+
     public static void setAutoExpiration(boolean isAuto) {
         com.tradplus.ads.open.TradPlusSdk.setAutoExpiration(isAuto);
+    }
+
+    public static void setAuthUID(boolean needAuthUID) {
+        com.tradplus.ads.open.TradPlusSdk.setAuthUID(getActivity(),needAuthUID);
     }
 
     public static void checkAutoExpiration() {
