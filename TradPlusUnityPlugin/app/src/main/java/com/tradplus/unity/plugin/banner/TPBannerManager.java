@@ -235,11 +235,15 @@ public class TPBannerManager extends BaseUnityPlugin {
                         float width = finalExtraInfo.getWidth();
                         float height = finalExtraInfo.getHeight();
 
-                        if (width != 0 || height != 0) {
+                        if(width != 0) {
                             params.width = (int) (width * density);
-                            params.height = (int) (height * density);
-                        } else {
+                        }else{
                             params.width = screenWidth;
+                        }
+
+                        if (height != 0) {
+                            params.height = (int) (height * density);
+                        }else {
                             params.height = (int) (50 * density);
                         }
                     }else{
