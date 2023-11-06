@@ -25,6 +25,7 @@ public class ExtraInfo {
     private float width;
     private float height;
     private int adPosition;
+    private String backgroundColor;
 
     private boolean openAutoLoadCallback;
     private float maxWaitTime;
@@ -200,5 +201,13 @@ public class ExtraInfo {
 
     public void setMaxWaitTime(float maxWaitTime) {
         this.maxWaitTime = maxWaitTime;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 }

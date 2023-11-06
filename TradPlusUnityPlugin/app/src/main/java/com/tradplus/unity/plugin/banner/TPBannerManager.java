@@ -1,6 +1,7 @@
 package com.tradplus.unity.plugin.banner;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,10 +54,17 @@ public class TPBannerManager extends BaseUnityPlugin {
 
         if (tpBanner != null) {
             ExtraInfo extraInfo = ExtraInfo.getExtraInfo(data);
-            if(extraInfo != null){
+            if (extraInfo != null) {
                 tpBanner.setAutoLoadCallback(extraInfo.isOpenAutoLoadCallback());
+
+                try {
+                    tpBanner.setBackgroundColor(Color.parseColor(extraInfo.getBackgroundColor()));
+
+                } catch (Throwable throwable) {
+                }
+
             }
-            tpBanner.loadAd(unitId, sceneId,extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
+            tpBanner.loadAd(unitId, sceneId, extraInfo == null ? 0f : extraInfo.getMaxWaitTime());
         }
 
     }
@@ -143,7 +151,7 @@ public class TPBannerManager extends BaseUnityPlugin {
 
     }
 
-    public void setCustomShowData(String adUnitId,String data) {
+    public void setCustomShowData(String adUnitId, String data) {
         TPBanner tpBanner = getTPBanner(adUnitId);
 
         if (tpBanner != null) {
@@ -231,22 +239,22 @@ public class TPBannerManager extends BaseUnityPlugin {
                     float density = ScreenUtil.getScreenDensity(getActivity());
 
                     int screenWidth = TPUtils.getScreenWidth(getActivity());
-                    if(finalExtraInfo != null) {
+                    if (finalExtraInfo != null) {
                         float width = finalExtraInfo.getWidth();
                         float height = finalExtraInfo.getHeight();
 
-                        if(width != 0) {
+                        if (width != 0) {
                             params.width = (int) (width * density);
-                        }else{
+                        } else {
                             params.width = screenWidth;
                         }
 
                         if (height != 0) {
                             params.height = (int) (height * density);
-                        }else {
+                        } else {
                             params.height = (int) (50 * density);
                         }
-                    }else{
+                    } else {
                         params.width = screenWidth;
                         params.height = (int) (50 * density);
                     }
@@ -287,7 +295,6 @@ public class TPBannerManager extends BaseUnityPlugin {
         if (cache == null) return null;
         return new TPAdInfo(unitId, cache.getAdapter());
     }
-
 
 
     private class TPBannerDownloadListener implements DownloadListener {
