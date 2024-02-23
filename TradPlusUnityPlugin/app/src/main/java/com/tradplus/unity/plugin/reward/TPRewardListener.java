@@ -1,8 +1,6 @@
 package com.tradplus.unity.plugin.reward;
 
 
-import java.util.Map;
-
 public interface TPRewardListener {
     void onAdLoaded(String unitId,String tpAdInfo);
 

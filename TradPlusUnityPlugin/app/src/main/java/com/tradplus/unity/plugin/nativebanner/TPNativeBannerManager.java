@@ -186,6 +186,7 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
         HashMap<String, Object> temp = new HashMap<>();
         TPNativeBannerInfo tpNativeBannerInfo = mTPNativeBanner.get(adUnitId);
         TPNativeBanner tpNativeBanner = null;
+        boolean closeAutoDestroy;
         if (tpNativeBannerInfo == null) {
             tpNativeBannerInfo = new TPNativeBannerInfo();
             mTPNativeBanner.put(adUnitId, tpNativeBannerInfo);
@@ -193,12 +194,13 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
             tpNativeBanner.closeAutoShow();
             tpNativeBannerInfo.setTpNativeBanner(tpNativeBanner);
 
+            closeAutoDestroy = extraInfo != null && extraInfo.isCloseAutoDestroy();
+            tpNativeBanner.setAutoDestroy(!closeAutoDestroy);
 
-            boolean closeAutoShow = extraInfo == null ? false : extraInfo.isCloseAutoShow();
+            boolean closeAutoShow = extraInfo != null && extraInfo.isCloseAutoShow();
             if (closeAutoShow) {
                 tpNativeBanner.closeAutoShow();
             }
-
             tpNativeBannerInfo.setCloseAutoShow(closeAutoShow);
             tpNativeBannerInfo.setWidth(extraInfo == null ? DeviceUtils.getScreenWidth(getActivity()) : extraInfo.getWidth());
             tpNativeBannerInfo.setHeight(extraInfo == null ? 50 : extraInfo.getHeight());
@@ -281,6 +283,8 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
         }
 
         if (extraInfo != null) {
+            closeAutoDestroy = extraInfo.isCloseAutoDestroy();
+            tpNativeBanner.setAutoDestroy(!closeAutoDestroy);
 
             if (extraInfo.getLocalParams() != null) {
                 temp = (HashMap<String, Object>) extraInfo.getLocalParams();
@@ -625,5 +629,6 @@ public class TPNativeBannerManager extends BaseUnityPlugin {
         public void setCloseAutoShow(boolean closeAutoShow) {
             this.closeAutoShow = closeAutoShow;
         }
+
     }
 }

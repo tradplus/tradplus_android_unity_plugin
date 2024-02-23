@@ -1,7 +1,5 @@
 package com.tradplus.unity.plugin.splash;
 
-import com.tradplus.ads.base.bean.TPBaseAd;
-
 interface TPSplashListener {
 
 

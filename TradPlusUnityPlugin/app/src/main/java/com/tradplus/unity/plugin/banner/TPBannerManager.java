@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.tradplus.ads.base.bean.TPAdError;
@@ -266,6 +265,8 @@ public class TPBannerManager extends BaseUnityPlugin {
         }
 
         if (extraInfo != null) {
+            boolean closeAutoDestroy = extraInfo.isCloseAutoDestroy();
+            tpBanner.setAutoDestroy(!closeAutoDestroy);
 
             if (extraInfo.getLocalParams() != null) {
                 temp = (HashMap<String, Object>) extraInfo.getLocalParams();

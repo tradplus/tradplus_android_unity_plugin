@@ -121,11 +121,11 @@ public class TPSplashManager extends BaseUnityPlugin {
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
 
-            tpSplash.setAdListener(new TPSplashManager.TPSplashAdListener(adUnitId, listener));
+            tpSplash.setAdListener(new TPSplashAdListener(adUnitId, listener));
             if (!isSimpleListener) {
 
-                tpSplash.setAllAdLoadListener(new TPSplashManager.TPSplashAllAdListener(adUnitId, listener));
-                tpSplash.setDownloadListener(new TPSplashManager.TPSplashDownloadListener(adUnitId, listener));
+                tpSplash.setAllAdLoadListener(new TPSplashAllAdListener(adUnitId, listener));
+                tpSplash.setDownloadListener(new TPSplashDownloadListener(adUnitId, listener));
 
             }
 

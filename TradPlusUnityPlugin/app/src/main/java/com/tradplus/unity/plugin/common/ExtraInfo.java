@@ -1,11 +1,9 @@
 package com.tradplus.unity.plugin.common;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.common.serialization.JSONArray;
-import com.tradplus.ads.common.serialization.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -20,6 +18,7 @@ public class ExtraInfo {
     private boolean isAutoload;
     private boolean closeAutoShow;
     private boolean needToClose;
+    private boolean closeAutoDestroy;
     private float x;
     private float y;
     private float width;
@@ -32,6 +31,14 @@ public class ExtraInfo {
 
     private boolean isSimpleListener;
 
+
+    public boolean isCloseAutoDestroy() {
+        return closeAutoDestroy;
+    }
+
+    public void setCloseAutoDestroy(boolean closeAutoDestroy) {
+        this.closeAutoDestroy = closeAutoDestroy;
+    }
 
     public boolean isNeedToClose() {
         return needToClose;
@@ -180,7 +187,7 @@ public class ExtraInfo {
                 return JSON.parseObject(data, ExtraInfo.class);
             }
         } catch (Throwable throwable) {
-
+            throwable.printStackTrace();
         }
 
 

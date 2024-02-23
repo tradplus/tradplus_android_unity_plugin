@@ -106,12 +106,12 @@ public class TPRewardManager extends BaseUnityPlugin {
 
             boolean isSimpleListener = extraInfo == null ? false : extraInfo.isSimpleListener();
 
-            tpReward.setAdListener(new TPRewardManager.TPRewardAdListener(adUnitId,listener));
+            tpReward.setAdListener(new TPRewardAdListener(adUnitId,listener));
             tpReward.setRewardAdExListener(new TPRewardExdListener(adUnitId, listener));
             if (!isSimpleListener) {
 
-                tpReward.setAllAdLoadListener(new TPRewardManager.TPRewardAllAdListener(adUnitId, listener));
-                tpReward.setDownloadListener(new TPRewardManager.TPRewardDownloadListener(adUnitId, listener));
+                tpReward.setAllAdLoadListener(new TPRewardAllAdListener(adUnitId, listener));
+                tpReward.setDownloadListener(new TPRewardDownloadListener(adUnitId, listener));
 
             }
 

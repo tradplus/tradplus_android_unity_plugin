@@ -15,7 +15,6 @@ import com.tradplus.ads.base.util.SegmentUtils;
 import com.tradplus.ads.common.serialization.JSON;
 import com.tradplus.ads.common.util.ResourceUtils;
 import com.tradplus.ads.common.util.ScreenUtil;
-import com.tradplus.ads.core.AdCacheManager;
 import com.tradplus.ads.open.DownloadListener;
 import com.tradplus.ads.open.LoadAdEveryLayerListener;
 import com.tradplus.ads.open.nativead.NativeAdListener;
